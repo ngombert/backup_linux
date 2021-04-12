@@ -22,8 +22,8 @@
 
 
 
-DATE = $(date +"%Y%m%d")
-HOUR = $(date +"%H%M")
+DATE=$(date +"%Y%m%d")
+HOUR=$(date +"%H%M")
 
 
 if [[ -f backup.conf ]]
@@ -37,6 +37,22 @@ fi
 LOCAL_MYSQL_BACKUP_DIR="${LOCAL_BACKUP_DIR}${DATE}/mysql/"
 LOCAL_FILE_BACKUP_DIR="${LOCAL_BACKUP_DIR}${DATE}/files/"
 LOCAL_LOGS_BACKUP_DIR="${LOCAL_BACKUP_DIR}${DATE}/logs/"
+
+if [[ ! -d $LOCAL_MYSQL_BACKUP_DIR ]]
+then
+    mkdir -p $LOCAL_MYSQL_BACKUP_DIR
+fi
+
+if [[ ! -d $LOCAL_FILE_BACKUP_DIR ]]
+then
+    mkdir -p $LOCAL_FILE_BACKUP_DIR
+fi
+
+if [[ ! -d $LOCAL_LOGS_BACKUP_DIR ]]
+then
+    mkdir -p $LOCAL_LOGS_BACKUP_DIR
+fi
+
 
 #####
 # FILE BACKUP
@@ -113,7 +129,7 @@ function purge_local_old_backup() {
 
 function purge_remote_old_backup() {
     # rdiff en remote
-
+    echo "todo"
     # TODO : 
 }
 
