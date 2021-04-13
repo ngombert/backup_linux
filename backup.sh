@@ -75,6 +75,19 @@ function file_backup() {
     echo "end of file backup."
 }
 
+function purge_local_old_backup() {
+    ARCHIVE_DIRECTORY = $1
+    RETENTION_DAYS = $2
+
+    # TODO : 
+    rdiff-backup --remove-older-than "$RETENTION_DAYS"D --force "$ARCHIVE_DIRECTORY"
+}
+
+function purge_remote_old_backup() {
+    # rdiff en remote
+    echo "todo"
+    # TODO : 
+}
 
 #####
 # MYSQL BACKUP
@@ -90,9 +103,7 @@ function mysql_database_backup() {
     MYSQL_OPTIONS="--dump-date --no-autocommit --single-transaction --hex-blob --triggers -R -E"
 
     echo "backing up database $DB_NAME from host $DB_SRV ..."
-    mysqldump -u"$DB_USER" -p"$DB_PASSWORD" "$DB_NAME" $MYSQL_OPTIONS | gzip > $BACKUP_FILE 2> $LOG_FILE
-
-    echo "end of database backup."
+    mysqldump -u"$DB_USER" -p"$DB_PASSWORD" $MYSQL_OPTIONS "$DB_NAME" | gzip > $BACKUP_FILE 2> $LOG_FILE
 }
 
 function mysql_backup_all() {
@@ -104,6 +115,8 @@ function mysql_backup_all() {
     BACKUP_DIR=$4
     LOG_DIR=$5
 
+    echo "**** start of database backup. ****"
+
     DB_LIST=$(mysqlshow | grep -v "+\|performance_schema\|Databases" | cut -d" " -f2)
 
     for DB_NAME in $DB_LIST
@@ -113,24 +126,16 @@ function mysql_backup_all() {
         "${LOG_DIR}${DATE}-${HOUR}-mysql-${DB_NAME}-error.log" \
         $DB_NAME
     done
+
+    echo "**** end of database backup. ****"
+
 }
 
-#####
-# COMMUN
-#####
+function mysql_purge_old_backup() {
+    $BACKUP_DIR=$1
+    $RETENTION=$2
 
-function purge_local_old_backup() {
-    ARCHIVE_DIRECTORY = $1
-    RETENTION_DAYS = $2
-
-    # TODO : 
-    rdiff-backup --remove-older-than "$RETENTION_DAYS"D --force "$ARCHIVE_DIRECTORY"
-}
-
-function purge_remote_old_backup() {
-    # rdiff en remote
-    echo "todo"
-    # TODO : 
+    #TODO : find -exec +rm
 }
 
 #####
