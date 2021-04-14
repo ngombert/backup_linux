@@ -1,1 +1,3 @@
 ./sandbox/test_rep
+./sandbox/test2
+./sandbox/test3
