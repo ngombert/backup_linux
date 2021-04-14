@@ -76,10 +76,10 @@ function local_file_backup() {
     do
         echo "$(date +"%Y%m%d-%H:%M:%S") - copying : $SOURCE"
         rsync -a $SOURCE $BACKUP_DIR
-        $STATUS=$?
+        STATUS=$?
     done
 
-    if [ ! $STATUS ]
+    if [ $STATUS -eq 0 ]
     then
         echo "$(date +"%Y%m%d-%H:%M:%S") - local file backup succeed, cleaning old backups"
         local_purge_old_backup $BACKUP_DIR $RETENTION
@@ -114,7 +114,7 @@ function remote_file_backup() {
     rsync -av -e "ssh -i $REMOTE_SRV_KEY_FILE" $BACKUP_DIR $REMOTE_SRV_USER@$REMOTE_SRV_NAME:$REMOTE_SRV_DIR
     echo "$(date +"%Y%m%d-%H:%M:%S") - rsync end"
 
-    if [ ! $? ]
+    if [ $? -eq 0 ]
     then
         echo "$(date +"%Y%m%d-%H:%M:%S") - remote file backup succeed, cleaning old backups"
         remote_purge_old_backup $REMOTE_SRV_USER $REMOTE_SRV_NAME $REMOTE_SRV_KEY_FILE $REMOTE_SRV_DIR $RETENTION
@@ -160,13 +160,16 @@ function mysql_backup_all() {
         mysql_database_backup $DB_SRV $DB_USER $DB_PASSWORD \
         "${BACKUP_DIR}${DATE}-${HOUR}-${DB_NAME}.sql.gz" \
         $DB_NAME
-        $STATUS=$?
+        STATUS=$?
     done
 
     # if no error during backup then remove old ones
-    if [! $STATUS ]
+    if [ $STATUS -eq 0 ]
     then
+        echo "$(date +"%Y%m%d-%H:%M:%S") - mysql backup succeed, cleaning old backups"
         local_purge_old_backup $BACKUP_DIR $RETENTION
+    else
+        echo "$(date +"%Y%m%d-%H:%M:%S") - mysql backup failed, skipping old backup purge"
     fi
     echo "$(date +"%Y%m%d-%H:%M:%S") - **** end of database backup. ****"
 
