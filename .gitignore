@@ -1,2 +1,6 @@
+
+# test directory
 sandbox/
+
+# used to store tar.gz file if needed
 dist/
